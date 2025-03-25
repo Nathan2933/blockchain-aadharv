@@ -1,0 +1,41 @@
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.optional {
+  color: var(--gray-light);
+  font-weight: normal;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--bg-light);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.input.error {
+  border-color: #ff4d4d;
+}
+
+.errorText {
+  color: #ff4d4d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+} 

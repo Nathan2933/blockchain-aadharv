@@ -1,0 +1,332 @@
+.navbar {
+  background-color: var(--white);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  padding: 0.75rem 0;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.navbar.scrolled {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+}
+
+.simpleNav {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.simpleNav .logo {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: all 0.2s ease;
+  margin-right: auto;
+}
+
+.logoText {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+}
+
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: auto;
+}
+
+.menuButton span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-color);
+  margin: 5px 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.menuButton.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menuButton.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuButton.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.mainLinks {
+  display: flex;
+  gap: 2rem;
+}
+
+.navLink {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.2s ease;
+}
+
+.navLink:hover,
+.navLink.active {
+  color: var(--primary-color);
+}
+
+.navLink:hover::after,
+.navLink.active::after {
+  width: 100%;
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.signInButton {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.signInButton:hover {
+  color: var(--primary-color);
+  background-color: var(--bg-light);
+}
+
+.contactButton {
+  background-color: var(--primary-color);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.contactButton:hover {
+  background-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.userMenu {
+  position: relative;
+}
+
+.userButton {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.userButton:hover {
+  background-color: var(--bg-light);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.userName {
+  color: var(--text-color);
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.userMenu:hover .chevron {
+  transform: rotate(180deg);
+}
+
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  min-width: 220px;
+  display: none;
+  border: 1px solid var(--gray-light);
+}
+
+.userMenu:hover .userDropdown {
+  display: block;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+.icon {
+  color: var(--text-light);
+  transition: color 0.2s ease;
+}
+
+.dropdownItem:hover .icon {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .menuButton {
+    display: block;
+  }
+
+  .navLinks {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--white);
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+    transition: right 0.3s ease;
+  }
+
+  .navLinks.active {
+    right: 0;
+  }
+
+  .mainLinks {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .navLink {
+    font-size: 1.1rem;
+  }
+
+  .authLinks {
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+  }
+
+  .signInButton,
+  .contactButton {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .userMenu {
+    width: 100%;
+  }
+
+  .userButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .userDropdown {
+    position: static;
+    box-shadow: none;
+    margin-top: 1rem;
+    display: none;
+    border: none;
+  }
+
+  .userMenu:hover .userDropdown {
+    display: block;
+  }
+} 
