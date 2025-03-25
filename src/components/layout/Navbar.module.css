@@ -1,12 +1,12 @@
 .navbar {
-  background-color: var(--white);
-  position: fixed;
-  width: 100%;
+  --navbar-height: 72px;
+  background-color: #FFE17D;
+  border-bottom: none;
+  position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 0.75rem 0;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid var(--gray-light);
+  height: var(--navbar-height);
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .navbar.scrolled {
@@ -26,22 +26,23 @@
 }
 
 .container {
-  max-width: 1280px;
+  max-width: var(--container-max-width, 1280px);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 3rem;
+  justify-content: space-between;
 }
 
 .logo {
-  font-size: 1.75rem;
+  font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: #272D31;
   text-decoration: none;
-  letter-spacing: -0.5px;
-  transition: all 0.2s ease;
-  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .logoText {
@@ -85,82 +86,106 @@
   transform: rotate(-45deg) translate(7px, -7px);
 }
 
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-}
-
-.mainLinks {
+.mainNav {
   display: flex;
   gap: 2rem;
+  margin-left: 3rem;
 }
 
 .navLink {
-  color: var(--text-color);
+  color: #272D31;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: 0.5rem;
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.navLink::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--primary-color);
-  transition: width 0.2s ease;
-}
-
-.navLink:hover,
-.navLink.active {
-  color: var(--primary-color);
-}
-
-.navLink:hover::after,
-.navLink.active::after {
-  width: 100%;
-}
-
-.authLinks {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: auto;
-}
-
-.signInButton {
-  color: var(--text-color);
-  text-decoration: none;
+  font-size: 15px;
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
-.signInButton:hover {
-  color: var(--primary-color);
-  background-color: var(--bg-light);
+.navLink:hover,
+.navLink.active {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #272D31;
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color, #272D31);
+  border-radius: 2px;
+}
+
+.authNav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loginLink {
+  color: #272D31;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.loginLink:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .contactButton {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background-color: #272D31;
+  color: #FFFFFF;
   text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1.25rem;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .contactButton:hover {
-  background-color: var(--accent-color);
   transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboardLink {
+  color: #272D31;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.dashboardLink:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.logoutButton {
+  background-color: transparent;
+  border: 1px solid #991b1b;
+  color: #991b1b;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #fee2e2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .userMenu {
@@ -259,54 +284,65 @@
   color: var(--primary-color);
 }
 
+.dashboardNav {
+  background-color: #FFE17D;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dashboardNav .mainNav {
+  margin-left: auto;
+  margin-right: 2rem;
+}
+
+.dashboardNav .navLink {
+  font-weight: 500;
+}
+
+.dashboardNav .navLink:hover,
+.dashboardNav .navLink.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.dashboardNav .navLink.active::after {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mainNav {
+    gap: 1.5rem;
+  }
+  
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .navbar {
+    --navbar-height: 64px;
+  }
+
   .container {
     padding: 0 1rem;
   }
 
-  .menuButton {
-    display: block;
+  .mainNav {
+    display: none;
   }
 
-  .navLinks {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    height: 100vh;
-    background-color: var(--white);
-    flex-direction: column;
-    justify-content: center;
-    padding: 2rem;
-    transition: right 0.3s ease;
+  .authNav {
+    gap: 0.5rem;
   }
 
-  .navLinks.active {
-    right: 0;
+  .loginLink {
+    display: none;
   }
 
-  .mainLinks {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .navLink {
-    font-size: 1.1rem;
-  }
-
-  .authLinks {
-    flex-direction: column;
-    align-items: center;
-    margin: 2rem 0;
-    gap: 1rem;
-  }
-
-  .signInButton,
-  .contactButton {
-    width: 100%;
-    text-align: center;
-    padding: 0.75rem 1.5rem;
+  .contactButton,
+  .logoutButton,
+  .dashboardLink {
+    padding: 0.5rem 1rem;
+    font-size: 14px;
   }
 
   .userMenu {
@@ -328,5 +364,23 @@
 
   .userMenu:hover .userDropdown {
     display: block;
+  }
+
+  .dashboardNav .mainNav {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    background-color: var(--white);
+    padding: 1rem;
+    border-bottom: 1px solid var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dashboardNav .navLink {
+    width: 100%;
+    text-align: center;
   }
 } 

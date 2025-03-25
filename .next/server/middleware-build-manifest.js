@@ -29,6 +29,21 @@ globalThis.__BUILD_MANIFEST = {
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/auth/commercial/login.js"
+    ],
+    "/auth/user/login": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/auth/user/login.js"
+    ],
+    "/commercial/dashboard": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/commercial/dashboard.js"
+    ],
+    "/user/dashboard": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/user/dashboard.js"
     ]
   },
   "ampFirstPages": []

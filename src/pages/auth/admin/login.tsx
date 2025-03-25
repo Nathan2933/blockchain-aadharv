@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import AuthCard from '../../../components/auth/AuthCard';
-import FormInput from '../../../components/common/FormInput';
-import { ADMIN_CREDENTIALS } from '../../../config/admin';
 import styles from '../../../components/auth/AuthCard.module.css';
 
 const AdminLogin = () => {
@@ -13,23 +11,44 @@ const AdminLogin = () => {
   });
 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    setError(''); // Clear error when user types
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
     
-    // Validate credentials
-    if (formData.employeeId === ADMIN_CREDENTIALS.employeeId && 
-        formData.password === ADMIN_CREDENTIALS.password) {
-      // TODO: Set admin session/token
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store token and admin data
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('admin', JSON.stringify(data.admin));
+      
+      // Redirect to dashboard
       router.push('/admin/dashboard');
-    } else {
-      setError('Invalid employee ID or password');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,6 +72,7 @@ const AdminLogin = () => {
             onChange={handleChange}
             required
             placeholder="Enter your employee ID"
+            disabled={isLoading}
           />
         </div>
 
@@ -66,11 +86,16 @@ const AdminLogin = () => {
             onChange={handleChange}
             required
             placeholder="Enter your password"
+            disabled={isLoading}
           />
         </div>
 
-        <button type="submit" className={styles.submitButton}>
-          Login
+        <button 
+          type="submit" 
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </AuthCard>

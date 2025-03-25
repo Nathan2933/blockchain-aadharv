@@ -53,7 +53,7 @@ const UserLogin = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       
       // Redirect to dashboard
-      router.push('/dashboard');
+      router.push('/user/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
     }

@@ -10,6 +10,9 @@ export interface ICommercialSpace extends Document {
   requestedFields: string[];
   status: 'pending' | 'approved' | 'rejected';
   password: string;
+  gstNumber: string;
+  cinNumber: string;
+  rejectionReason?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +63,17 @@ const commercialSpaceSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  gstNumber: {
+    type: String,
+    required: true
+  },
+  cinNumber: {
+    type: String,
+    required: true
+  },
+  rejectionReason: {
+    type: String
   },
   createdAt: {
     type: Date,

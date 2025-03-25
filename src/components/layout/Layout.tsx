@@ -7,16 +7,20 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps) {
+const Layout = ({ children }: LayoutProps) => {
   const router = useRouter();
-  const isAuthPage = router.pathname.includes('/auth/');
+  
+  // Check if current path is a login page
+  const isLoginPage = router.pathname.includes('/auth/');
 
   return (
     <div className={styles.layout}>
-      {!isAuthPage && <Navbar />}
-      <main className={`${styles.main} ${!isAuthPage ? styles.hasNavbar : ''}`}>
+      {!isLoginPage && <Navbar />}
+      <main className={`${styles.main} ${isLoginPage ? styles.noNavbar : ''}`}>
         {children}
       </main>
     </div>
   );
-} 
+};
+
+export default Layout; 

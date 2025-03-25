@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useAdminAuth } from '../../hooks/useAdminAuth';
 import styles from './Dashboard.module.css';
 
 interface CommercialSpace {
@@ -14,6 +15,7 @@ interface CommercialSpace {
 
 const AdminDashboard = () => {
   const router = useRouter();
+  const { isLoading: authLoading, logout } = useAdminAuth();
   const [commercialSpaces, setCommercialSpaces] = useState<CommercialSpace[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,7 +29,12 @@ const AdminDashboard = () => {
 
   const fetchCommercialSpaces = async () => {
     try {
-      const response = await fetch('/api/admin/get-commercial-spaces');
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/get-commercial-spaces', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -50,10 +57,12 @@ const AdminDashboard = () => {
     }
 
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/update-commercial-status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ id, status: newStatus }),
       });
@@ -64,7 +73,6 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Failed to update status');
       }
 
-      // Update local state
       setCommercialSpaces(prev =>
         prev.map(space =>
           space._id === id ? { ...space, status: newStatus } : space
@@ -79,10 +87,12 @@ const AdminDashboard = () => {
     if (!selectedSpaceId || !rejectionReason) return;
 
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/update-commercial-status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           id: selectedSpaceId,
@@ -97,14 +107,12 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Failed to reject commercial space');
       }
 
-      // Update local state
       setCommercialSpaces(prev =>
         prev.map(space =>
           space._id === selectedSpaceId ? { ...space, status: 'rejected' } : space
         )
       );
 
-      // Reset modal state
       setShowRejectionModal(false);
       setRejectionReason('');
       setSelectedSpaceId(null);
@@ -113,14 +121,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const pendingCount = commercialSpaces.filter(r => r.status === 'pending').length;
-  const approvedCount = commercialSpaces.filter(r => r.status === 'approved').length;
-  const rejectedCount = commercialSpaces.filter(r => r.status === 'rejected').length;
-
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className={styles.dashboard}>
-        <div className={styles.loading}>Loading...</div>
+        <div className={styles.container}>
+          <div className={styles.loading}>Loading...</div>
+        </div>
       </div>
     );
   }
@@ -128,120 +134,123 @@ const AdminDashboard = () => {
   if (error) {
     return (
       <div className={styles.dashboard}>
-        <div className={styles.error}>{error}</div>
+        <div className={styles.container}>
+          <div className={styles.error}>{error}</div>
+        </div>
       </div>
     );
   }
 
+  const pendingCount = commercialSpaces.filter(r => r.status === 'pending').length;
+  const approvedCount = commercialSpaces.filter(r => r.status === 'approved').length;
+  const rejectedCount = commercialSpaces.filter(r => r.status === 'rejected').length;
+
   return (
     <div className={styles.dashboard}>
-      <div className={styles.header}>
-        <h1>👋 Welcome, Admin</h1>
-        <div className={styles.stats}>
-          <div className={styles.statCard}>
-            <h3>📝 Pending Requests</h3>
-            <p>{pendingCount}</p>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div>
+            <h1>Admin Dashboard</h1>
+            <p className={styles.subtitle}>Manage commercial space applications</p>
           </div>
-          <div className={styles.statCard}>
-            <h3>✅ Approved Spaces</h3>
-            <p>{approvedCount}</p>
+          <button className={styles.dangerButton} onClick={logout}>
+            Sign Out
+          </button>
+        </div>
+
+        <div className={styles.statsGrid}>
+          <div className={`${styles.statCard} ${styles.pending}`}>
+            <h3>Pending</h3>
+            <p className={styles.statNumber}>{pendingCount}</p>
           </div>
-          <div className={styles.statCard}>
-            <h3>❌ Rejected Requests</h3>
-            <p>{rejectedCount}</p>
+          <div className={`${styles.statCard} ${styles.approved}`}>
+            <h3>Approved</h3>
+            <p className={styles.statNumber}>{approvedCount}</p>
+          </div>
+          <div className={`${styles.statCard} ${styles.rejected}`}>
+            <h3>Rejected</h3>
+            <p className={styles.statNumber}>{rejectedCount}</p>
           </div>
         </div>
-      </div>
 
-      <div className={styles.section}>
-        <h2>Commercial Space Requests</h2>
-        <div className={styles.requestsTable}>
-          <table>
-            <thead>
-              <tr>
-                <th>Firm Name</th>
-                <th>Manager</th>
-                <th>Email</th>
-                <th>Requested Fields</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commercialSpaces.map(space => (
-                <tr key={space._id}>
-                  <td>
-                    <strong>{space.firmName}</strong>
-                  </td>
-                  <td>{space.managerName}</td>
-                  <td>
-                    <a href={`mailto:${space.email}`} className={styles.email}>
-                      {space.email}
-                    </a>
-                  </td>
-                  <td>
-                    <ul className={styles.fieldsList}>
-                      {space.requestedFields.map(field => (
-                        <li key={field}>{field}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>
-                    <span className={`${styles.status} ${styles[`status${space.status.charAt(0).toUpperCase() + space.status.slice(1)}`]}`}>
-                      {space.status === 'pending' ? '⏳' : space.status === 'approved' ? '✅' : '❌'} {space.status}
-                    </span>
-                  </td>
-                  <td>
-                    {space.status === 'pending' && (
-                      <div className={styles.actions}>
-                        <button 
-                          onClick={() => handleStatusUpdate(space._id, 'approved')}
-                          className={styles.approveBtn}
-                        >
-                          Approve
-                        </button>
-                        <button 
-                          onClick={() => handleStatusUpdate(space._id, 'rejected')}
-                          className={styles.rejectBtn}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    )}
-                  </td>
+        <div className={styles.card}>
+          <h2>Commercial Space Applications</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Firm Name</th>
+                  <th>Manager</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {commercialSpaces.map((space) => (
+                  <tr key={space._id}>
+                    <td>{space.firmName}</td>
+                    <td>{space.managerName}</td>
+                    <td>{space.email}</td>
+                    <td>
+                      <span className={`${styles.status} ${styles[`status${space.status.charAt(0).toUpperCase() + space.status.slice(1)}`]}`}>
+                        {space.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>{new Date(space.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      {space.status === 'pending' && (
+                        <div className={styles.actionButtons}>
+                          <button
+                            className={styles.approveButton}
+                            onClick={() => handleStatusUpdate(space._id, 'approved')}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className={styles.rejectButton}
+                            onClick={() => handleStatusUpdate(space._id, 'rejected')}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {showRejectionModal && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2>Reject Commercial Space</h2>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h2>Reject Application</h2>
             <p>Please provide a reason for rejection:</p>
             <textarea
+              className={styles.textarea}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className={styles.textarea}
               placeholder="Enter rejection reason..."
-              required
+              rows={4}
             />
             <div className={styles.modalActions}>
               <button
+                className={styles.cancelButton}
                 onClick={() => {
                   setShowRejectionModal(false);
                   setRejectionReason('');
                   setSelectedSpaceId(null);
                 }}
-                className={styles.cancelBtn}
               >
                 Cancel
               </button>
               <button
+                className={styles.confirmButton}
                 onClick={handleReject}
-                className={styles.rejectBtn}
                 disabled={!rejectionReason.trim()}
               >
                 Confirm Rejection
