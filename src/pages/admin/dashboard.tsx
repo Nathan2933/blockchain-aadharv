@@ -1,73 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import styles from './Dashboard.module.css';
 
-interface CommercialRequest {
-  id: string;
+interface CommercialSpace {
+  _id: string;
   firmName: string;
   managerName: string;
   email: string;
   status: 'pending' | 'approved' | 'rejected';
   requestedFields: string[];
-  timestamp: string;
+  createdAt: string;
 }
 
 const AdminDashboard = () => {
-  // Mock data for commercial space requests
-  const [requests, setRequests] = useState<CommercialRequest[]>([
-    {
-      id: '1',
-      firmName: 'Hotel Luxury Inn',
-      managerName: 'John Doe',
-      email: 'john@luxuryinn.com',
-      status: 'pending',
-      requestedFields: ['Name', 'Phone', 'Email'],
-      timestamp: '2024-03-25 10:30 AM'
-    },
-    {
-      id: '2',
-      firmName: 'City Hospital',
-      managerName: 'Jane Smith',
-      email: 'jane@cityhospital.com',
-      status: 'pending',
-      requestedFields: ['Name', 'Aadhar', 'Phone', 'Email'],
-      timestamp: '2024-03-25 11:45 AM'
-    },
-    {
-      id: '3',
-      firmName: 'Tech Solutions Inc',
-      managerName: 'Mike Johnson',
-      email: 'mike@techsolutions.com',
-      status: 'approved',
-      requestedFields: ['Name', 'Email', 'Phone'],
-      timestamp: '2024-03-25 09:15 AM'
-    },
-    {
-      id: '4',
-      firmName: 'Global Bank',
-      managerName: 'Sarah Wilson',
-      email: 'sarah@globalbank.com',
-      status: 'rejected',
-      requestedFields: ['Name', 'Aadhar', 'PAN', 'Phone'],
-      timestamp: '2024-03-24 03:20 PM'
+  const router = useRouter();
+  const [commercialSpaces, setCommercialSpaces] = useState<CommercialSpace[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCommercialSpaces();
+  }, []);
+
+  const fetchCommercialSpaces = async () => {
+    try {
+      const response = await fetch('/api/admin/get-commercial-spaces');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch commercial spaces');
+      }
+
+      setCommercialSpaces(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const handleApprove = (id: string) => {
-    setRequests(prev => prev.map(req => 
-      req.id === id ? { ...req, status: 'approved' } : req
-    ));
-    // TODO: Generate and assign QR code
   };
 
-  const handleReject = (id: string) => {
-    setRequests(prev => prev.map(req => 
-      req.id === id ? { ...req, status: 'rejected' } : req
-    ));
+  const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
+    if (newStatus === 'rejected') {
+      setSelectedSpaceId(id);
+      setShowRejectionModal(true);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/update-commercial-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update status');
+      }
+
+      // Update local state
+      setCommercialSpaces(prev =>
+        prev.map(space =>
+          space._id === id ? { ...space, status: newStatus } : space
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update status');
+    }
   };
 
-  const pendingCount = requests.filter(r => r.status === 'pending').length;
-  const approvedCount = requests.filter(r => r.status === 'approved').length;
-  const rejectedCount = requests.filter(r => r.status === 'rejected').length;
+  const handleReject = async () => {
+    if (!selectedSpaceId || !rejectionReason) return;
+
+    try {
+      const response = await fetch('/api/admin/update-commercial-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: selectedSpaceId,
+          status: 'rejected',
+          rejectionReason,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reject commercial space');
+      }
+
+      // Update local state
+      setCommercialSpaces(prev =>
+        prev.map(space =>
+          space._id === selectedSpaceId ? { ...space, status: 'rejected' } : space
+        )
+      );
+
+      // Reset modal state
+      setShowRejectionModal(false);
+      setRejectionReason('');
+      setSelectedSpaceId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reject commercial space');
+    }
+  };
+
+  const pendingCount = commercialSpaces.filter(r => r.status === 'pending').length;
+  const approvedCount = commercialSpaces.filter(r => r.status === 'approved').length;
+  const rejectedCount = commercialSpaces.filter(r => r.status === 'rejected').length;
+
+  if (loading) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.loading}>Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.error}>{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dashboard}>
@@ -77,23 +141,14 @@ const AdminDashboard = () => {
           <div className={styles.statCard}>
             <h3>📝 Pending Requests</h3>
             <p>{pendingCount}</p>
-            <span className={styles.trend}>
-              {pendingCount > 0 ? '↑' : '→'} {pendingCount} this week
-            </span>
           </div>
           <div className={styles.statCard}>
             <h3>✅ Approved Spaces</h3>
             <p>{approvedCount}</p>
-            <span className={styles.trend}>
-              {approvedCount > 0 ? '↑' : '→'} {approvedCount} this week
-            </span>
           </div>
           <div className={styles.statCard}>
             <h3>❌ Rejected Requests</h3>
             <p>{rejectedCount}</p>
-            <span className={styles.trend}>
-              {rejectedCount > 0 ? '↑' : '→'} {rejectedCount} this week
-            </span>
           </div>
         </div>
       </div>
@@ -113,50 +168,45 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {requests.map(request => (
-                <tr key={request.id}>
+              {commercialSpaces.map(space => (
+                <tr key={space._id}>
                   <td>
-                    <strong>{request.firmName}</strong>
+                    <strong>{space.firmName}</strong>
                   </td>
-                  <td>{request.managerName}</td>
+                  <td>{space.managerName}</td>
                   <td>
-                    <a href={`mailto:${request.email}`} className={styles.email}>
-                      {request.email}
+                    <a href={`mailto:${space.email}`} className={styles.email}>
+                      {space.email}
                     </a>
                   </td>
                   <td>
                     <ul className={styles.fieldsList}>
-                      {request.requestedFields.map(field => (
+                      {space.requestedFields.map(field => (
                         <li key={field}>{field}</li>
                       ))}
                     </ul>
                   </td>
                   <td>
-                    <span className={`${styles.status} ${styles[`status${request.status.charAt(0).toUpperCase() + request.status.slice(1)}`]}`}>
-                      {request.status === 'pending' ? '⏳' : request.status === 'approved' ? '✅' : '❌'} {request.status}
+                    <span className={`${styles.status} ${styles[`status${space.status.charAt(0).toUpperCase() + space.status.slice(1)}`]}`}>
+                      {space.status === 'pending' ? '⏳' : space.status === 'approved' ? '✅' : '❌'} {space.status}
                     </span>
                   </td>
                   <td>
-                    {request.status === 'pending' && (
+                    {space.status === 'pending' && (
                       <div className={styles.actions}>
                         <button 
-                          onClick={() => handleApprove(request.id)}
+                          onClick={() => handleStatusUpdate(space._id, 'approved')}
                           className={styles.approveBtn}
                         >
                           Approve
                         </button>
                         <button 
-                          onClick={() => handleReject(request.id)}
+                          onClick={() => handleStatusUpdate(space._id, 'rejected')}
                           className={styles.rejectBtn}
                         >
                           Reject
                         </button>
                       </div>
-                    )}
-                    {request.status === 'approved' && (
-                      <button className={styles.qrBtn}>
-                        View QR
-                      </button>
                     )}
                   </td>
                 </tr>
@@ -166,26 +216,40 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h2>Recent Activity</h2>
-        <div className={styles.activityList}>
-          {requests.map(request => (
-            <div key={request.id} className={styles.activityItem}>
-              <div className={styles.activityIcon}>
-                {request.status === 'pending' ? '🔔' : request.status === 'approved' ? '✅' : '❌'}
-              </div>
-              <div className={styles.activityContent}>
-                <p>
-                  <strong>{request.firmName}</strong> requested registration
-                </p>
-                <span className={styles.timestamp}>
-                  🕒 {request.timestamp}
-                </span>
-              </div>
+      {showRejectionModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>Reject Commercial Space</h2>
+            <p>Please provide a reason for rejection:</p>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              className={styles.textarea}
+              placeholder="Enter rejection reason..."
+              required
+            />
+            <div className={styles.modalActions}>
+              <button
+                onClick={() => {
+                  setShowRejectionModal(false);
+                  setRejectionReason('');
+                  setSelectedSpaceId(null);
+                }}
+                className={styles.cancelBtn}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReject}
+                className={styles.rejectBtn}
+                disabled={!rejectionReason.trim()}
+              >
+                Confirm Rejection
+              </button>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

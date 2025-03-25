@@ -1,86 +1,111 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import AuthCard from '../../../components/auth/AuthCard';
 import styles from '../../../components/auth/AuthCard.module.css';
 
+interface LoginData {
+  email: string;
+  password: string;
+}
+
 const UserLogin = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginData>({
     email: '',
-    password: '',
+    password: ''
   });
-
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (router.query.registered === 'true') {
+      setError('Registration successful! Please login.');
+    }
+  }, [router.query]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    setError(''); // Clear error when user types
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement user login logic
+    setError('');
+    
     try {
-      // Temporary login success simulation
-      console.log('Login attempt:', formData);
-      router.push('/user/dashboard');
+      const response = await fetch('/api/auth/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store token and user data
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
     } catch (err) {
-      setError('Invalid email or password');
+      setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
     }
   };
 
   return (
-    <AuthCard 
-      title="User Login" 
-      subtitle="Access your secure digital identity"
-    >
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-          <div className={styles.errorMessage}>{error}</div>
-        </div>}
-        
-        <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-          <label className={styles.label}>Email Address</label>
-          <input
-            type="email"
-            name="email"
-            className={styles.input}
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="Enter your email"
-          />
-        </div>
+    <div className={styles.authWrapper}>
+      <div className={styles.authCard}>
+        <h1 className={styles.title}>User Login</h1>
+        <p className={styles.subtitle}>Sign in to your account</p>
 
-        <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-          <label className={styles.label}>Password</label>
-          <input
-            type="password"
-            name="password"
-            className={styles.input}
-            value={formData.password}
-            onChange={handleChange}
-            required
-            placeholder="Enter your password"
-          />
-        </div>
+        {error && <div className={styles.errorMessage}>{error}</div>}
 
-        <button type="submit" className={styles.submitButton}>
-          Login
-        </button>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email</label>
+            <input
+              type="email"
+              name="email"
+              className={styles.input}
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="Enter your email"
+            />
+          </div>
 
-        <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.links}`}>
-          <Link href="/auth/user/register" className={styles.link}>
-            Create new account
-          </Link>
-          <Link href="/auth/user/forgot-password" className={styles.link}>
-            Forgot password?
-          </Link>
-        </div>
-      </form>
-    </AuthCard>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Password</label>
+            <input
+              type="password"
+              name="password"
+              className={styles.input}
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <button type="submit" className={styles.submitButton}>
+            Login
+          </button>
+
+          <div className={styles.links}>
+            <Link href="/auth/user/register" className={styles.link}>
+              Don't have an account? Register
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

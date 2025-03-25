@@ -2,6 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/auth/user/register": "pages/auth/user/register.js",
-  "/auth/user/login": "pages/auth/user/login.js"
+  "/auth/commercial/login": "pages/auth/commercial/login.js",
+  "/admin/dashboard": "pages/admin/dashboard.js",
+  "/api/admin/get-commercial-spaces": "pages/api/admin/get-commercial-spaces.js",
+  "/api/admin/update-commercial-status": "pages/api/admin/update-commercial-status.js",
+  "/api/commercial/login": "pages/api/commercial/login.js"
 }
