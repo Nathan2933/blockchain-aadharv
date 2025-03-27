@@ -153,9 +153,6 @@ const AdminDashboard = () => {
             <h1>Admin Dashboard</h1>
             <p className={styles.subtitle}>Manage commercial space applications</p>
           </div>
-          <button className={styles.dangerButton} onClick={logout}>
-            Sign Out
-          </button>
         </div>
 
         <div className={styles.statsGrid}>

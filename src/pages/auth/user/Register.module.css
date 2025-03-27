@@ -1,3 +1,17 @@
+.root {
+  --primary-color: #FFE17D;
+  --text-color: #272D31;
+  --error-bg: #fff2f2;
+  --error-border: #ff4d4d;
+  --error-text: #ff4d4d;
+  --input-border: #e5e7eb;
+  --input-focus: #FFE17D;
+  --button-hover: #FFD747;
+  --link-color: #272D31;
+  --bg-light: #f8f9fa;
+  --white: #ffffff;
+}
+
 .form {
   display: flex;
   flex-direction: column;

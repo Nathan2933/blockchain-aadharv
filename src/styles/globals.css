@@ -1,24 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #2563eb;
-  --secondary-color: #f8fafc;
-  --text-color: #1e293b;
-  --text-light: #64748b;
-  --accent-color: #3b82f6;
-  --gray-light: #e2e8f0;
-  --gray-medium: #cbd5e1;
-  --white: #FFFFFF;
-  --bg-light: #f1f5f9;
-  --bg-lighter: #f8fafc;
-  --success: #22c55e;
-  --error: #ef4444;
-  --warning: #f59e0b;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-}
-
+      --primary-color: #ffd000;
+      --background-color: #fbdb6b;
+      --secondary-color: #ffffff; /* White */
+      --text-color: #000000; /* Black */
+      --text-light: #abb8c3; /* Cyan Bluish Gray */
+      --accent-color: #9b51e0; /* Vivid Purple */
+      --gray-light: #8ed1fc; /* Pale Cyan Blue */
+      --gray-medium: #7bdcb5; /* Light Green Cyan */
+      --white: #ffffff; /* White */
+      --bg-light: #abb8c3; /* Cyan Bluish Gray */
+      --bg-lighter: #ffffff; /* Pale Cyan Blue */
+      --success: #00d084; /* Vivid Green Cyan */
+      --error: #cf2e2e; /* Vivid Red */
+      --warning: #f59e0b; /* Orange-Yellow Warning Color */
+    
+      /* Shadows */
+      --shadow-sm: 6px 6px 9px rgba(0, 0, 0, 0.2); /* Natural */
+      --shadow-md: 12px 12px 50px rgba(0, 0, 0, 0.4); /* Deep */
+      --shadow-lg: 6px 6px 0px rgba(0, 0, 0, 0.2); /* Sharp */
+    }
 * {
   box-sizing: border-box;
   margin: 0;

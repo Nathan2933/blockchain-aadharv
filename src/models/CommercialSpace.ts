@@ -66,11 +66,9 @@ const commercialSpaceSchema = new mongoose.Schema({
   },
   gstNumber: {
     type: String,
-    required: true
   },
   cinNumber: {
     type: String,
-    required: true
   },
   rejectionReason: {
     type: String

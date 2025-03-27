@@ -17,6 +17,7 @@ interface CommercialRegistrationData {
 
 const CommercialRegister = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<CommercialRegistrationData>({
     firmName: '',
     managerName: '',
@@ -58,14 +59,17 @@ const CommercialRegister = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     if (formData.requestedFields.length === 0) {
       setError('Please select at least one field to request from users');
+      setIsLoading(false);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setIsLoading(false);
       return;
     }
 
@@ -96,6 +100,8 @@ const CommercialRegister = () => {
       router.push('/auth/commercial/login?registered=true');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to register. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -231,8 +237,12 @@ const CommercialRegister = () => {
           />
         </div>
 
-        <button type="submit" className={styles.submitButton}>
-          Register
+        <button 
+          type="submit" 
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Registering...' : 'Register'}
         </button>
 
         <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.links}`}>

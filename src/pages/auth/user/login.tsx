@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import AuthCard from '../../../components/auth/AuthCard';
+import specific from './Login.module.css';
 import styles from '../../../components/auth/AuthCard.module.css';
 
 interface LoginData {
@@ -11,6 +12,8 @@ interface LoginData {
 
 const UserLogin = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const { registered } = router.query;
   const [formData, setFormData] = useState<LoginData>({
     email: '',
     password: ''
@@ -18,7 +21,7 @@ const UserLogin = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (router.query.registered === 'true') {
+    if (registered === 'true') {
       setError('Registration successful! Please login.');
     }
   }, [router.query]);
@@ -32,6 +35,7 @@ const UserLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
     try {
       const response = await fetch('/api/auth/user/login', {
@@ -42,10 +46,23 @@ const UserLogin = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error('Server error: Invalid response format');
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        if (data.message === 'Invalid credentials') {
+          setError('Invalid credentials');
+          return;
+        }else if (data.message === 'Internal server error') {
+          setError('Internal server error');
+          return;
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
       }
 
       // Store token and user data
@@ -55,7 +72,10 @@ const UserLogin = () => {
       // Redirect to dashboard
       router.push('/user/dashboard');
     } catch (err) {
+      console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,10 +85,9 @@ const UserLogin = () => {
         <h1 className={styles.title}>User Login</h1>
         <p className={styles.subtitle}>Sign in to your account</p>
 
-        {error && <div className={styles.errorMessage}>{error}</div>}
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
+        <form onSubmit={handleSubmit} className={`${styles.form} ${styles.formGroup} ${specific.form} ${styles.fullWidth}`}>
+          {error && <div className={`${styles.errorMessage} ${specific.label}`}>{error}</div>}
+          <div className={`${styles.formGroup} ${specific.form} ${styles.fullWidth}`}>
             <label className={styles.label}>Email</label>
             <input
               type="email"
@@ -81,7 +100,7 @@ const UserLogin = () => {
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={`${styles.formGroup} ${specific.form} ${styles.fullWidth}`}>
             <label className={styles.label}>Password</label>
             <input
               type="password"
@@ -94,15 +113,20 @@ const UserLogin = () => {
             />
           </div>
 
-          <button type="submit" className={styles.submitButton}>
-            Login
-          </button>
+          <button 
+          type="submit" 
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
 
-          <div className={styles.links}>
-            <Link href="/auth/user/register" className={styles.link}>
-              Don't have an account? Register
-            </Link>
-          </div>
+          <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.links}`}>
+          <span>Don't have an account?</span>
+          <a href="/auth/user/register" className={styles.link}>
+            Register here
+          </a>
+        </div>
         </form>
       </div>
     </div>
