@@ -2,12 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/auth/user/login": "pages/auth/user/login.js",
+  "/user/dashboard": "pages/user/dashboard.js",
   "/auth/commercial/login": "pages/auth/commercial/login.js",
-  "/api/admin/update-commercial-status": "pages/api/admin/update-commercial-status.js",
   "/api/commercial/login": "pages/api/commercial/login.js",
   "/commercial/dashboard": "pages/commercial/dashboard.js",
-  "/api/commercial/get-profile": "pages/api/commercial/get-profile.js",
-  "/user/dashboard": "pages/user/dashboard.js",
-  "/api/user/get-profile": "pages/api/user/get-profile.js",
-  "/auth/user/login": "pages/auth/user/login.js"
+  "/api/commercial/get-profile": "pages/api/commercial/get-profile.js"
 }

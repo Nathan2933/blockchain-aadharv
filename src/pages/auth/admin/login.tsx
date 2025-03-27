@@ -97,6 +97,9 @@ const AdminLogin = () => {
         >
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
+
+        <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.links}`}>
+        </div>
       </form>
     </AuthCard>
   );
